@@ -1,0 +1,40 @@
+{
+  "family": "fastapi-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "3072",
+  "executionRoleArn": "arn:aws:iam::691645677816:role/ecs-execution-role",
+  "taskRoleArn": "arn:aws:iam::691645677816:role/ecs-task-role",
+  "containerDefinitions": [
+    {
+      "name": "fastapi-app",
+      "image": "REPLACE_IMAGE",
+      "essential": true,
+
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:691645677816:parameter/DATABASE_URL"
+        }
+      ],
+
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/topu-devops-assesment",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "app"
+        }
+      }
+    }
+  ]
+}

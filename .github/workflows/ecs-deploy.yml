@@ -1,0 +1,50 @@
+name: CD - Deploy to ECS Fargate
+
+on:
+  workflow_run:
+    workflows: ["Build & Push to ECR"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    # run only if the build workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      # 1. Checkout code 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. AWS credentials configure
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 3. Image variable set (SHA tag)
+      - name: Set image
+        run: |
+          echo "IMAGE=${{ secrets.ECR_REGISTRY }}/topu-devops-assesment:${{ github.sha }}" >> $GITHUB_ENV
+
+      # 4. Task definition Image update
+      - name: Render ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: fastapi-app
+          image: ${{ env.IMAGE }}
+
+      # 5. ECS deploy
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: fastapi-fargate-service
+          cluster: fastapi-fargate-cluster
+          wait-for-service-stability: true

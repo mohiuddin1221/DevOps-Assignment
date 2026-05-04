@@ -19,7 +19,7 @@ RUN uv sync --frozen
 COPY . .
 
 # expose fastapi port
-EXPOSE 8000
+EXPOSE 80
 
 # run app
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80"]
