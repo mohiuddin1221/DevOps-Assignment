@@ -10,15 +10,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # run only if the build workflow succeeded
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      # 1. Checkout code 
+      # 1. Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. AWS credentials configure
+      # 2. AWS Credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -26,12 +25,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # 3. Image variable set (SHA tag)
+      # 3. Set Image
       - name: Set image
         run: |
+          echo "IMAGE=${{ secrets.ECR_REGISTRY }}/topu-devops-assesment:${{ github.sha }}"
           echo "IMAGE=${{ secrets.ECR_REGISTRY }}/topu-devops-assesment:${{ github.sha }}" >> $GITHUB_ENV
 
-      # 4. Task definition Image update
+      # 4. Debug: Show task-definition.json
+      - name: Show task definition file
+        run: |
+          echo "====== TASK DEFINITION (BEFORE) ======"
+          cat task-definition.json
+
+      # 5. Render Task Definition
       - name: Render ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -40,11 +46,23 @@ jobs:
           container-name: fastapi-app
           image: ${{ env.IMAGE }}
 
-      # 5. ECS deploy
+      # 6. Debug: Show rendered task definition
+      - name: Show rendered task definition
+        run: |
+          echo "====== TASK DEFINITION (AFTER RENDER) ======"
+          cat ${{ steps.task-def.outputs.task-definition }}
+
+      # 7. Deploy
       - name: Deploy to ECS
+        id: deploy
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: fastapi-fargate-service
           cluster: fastapi-fargate-cluster
           wait-for-service-stability: true
+
+      # 8. Debug: Deployment finished
+      - name: Deployment status
+        run: |
+          echo "Deployment finished. Check ECS console for events."
