@@ -34,9 +34,9 @@ jobs:
       # 5. Tag image
       - name: Tag image
         run: |
-          docker tag devops-assessment:latest ${{ secrets.ECR_REGISTRY }}/devops-assessment:${{ github.sha }}
+          docker tag devops-assessment:latest ${{ secrets.ECR_REGISTRY }}/topu-devops-assesment:${{ github.sha }}
 
       # 6. Push image to ECR
       - name: Push image
         run: |
-          docker push ${{ secrets.ECR_REGISTRY }}/devops-assessment:${{ github.sha }}
+          docker push ${{ secrets.ECR_REGISTRY }}/topu-devops-assesment:${{ github.sha }}
