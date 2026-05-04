@@ -22,4 +22,5 @@ COPY . .
 EXPOSE 80
 
 # run app
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80"]
+# run app
+CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80"]
