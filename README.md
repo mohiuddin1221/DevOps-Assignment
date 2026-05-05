@@ -1,16 +1,39 @@
-# Devops Assessment
+# 🚀 FastAPI Service - DevOps Assessment
 
-## How to Run
+This repository contains the **FastAPI** application, containerized and deployed on **AWS ECS Fargate**. 
 
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-git clone https://github.com/goldkinen/devops-assessment.git
-cd devops-assessment
-uv venv --python 3.13
-source .venv/bin/activate
-uv sync
+## 🌐 Live Application
+You can interact with the live API and its documentation here:  
+🔗 [Live Swagger UI](http://fastapi-fargate-alb-1453230624.us-east-1.elb.amazonaws.com/docs)
 
-export PYTHONPATH=$(pwd)
-export $(xargs < .env)
-uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
-```
+## 📸 Project Architecture
+The following diagram illustrates the cloud infrastructure and data flow for this deployment:
+
+<p align="center">
+  <img width="100%" src="https://github.com/user-attachments/assets/80ceb870-daa9-40b5-89ae-fc88812ed3f3" alt="Architecture Diagram">
+</p>
+
+---
+
+## 🏗️ Infrastructure as Code (IaC)
+The entire environment (VPC, ECS, ALB, etc.) was provisioned using **Terraform**. The infrastructure code is decoupled from the application logic and maintained in a separate repository.
+
+🔗 **View Infrastructure Code:** [mohiuddin1221/Terraform](https://github.com/mohiuddin1221/Terraform)
+
+---
+
+## 🛠️ Tech Stack & Key Features
+*   **Language:** Python (FastAPI)
+*   **Containerization:** Docker (Multi-stage build)
+*   **Orchestration:** AWS ECS Fargate (Serverless)
+*   **Infrastructure:** Terraform (Modular Design)
+*   **Networking:** Custom VPC with Public & Private Subnets
+*   **Database:** Neon DB (PostgreSQL)
+
+---
+
+## 🚀 Deployment Workflow
+1.  **Containerize:** Application is built into a Docker image.
+2.  **IaC:** Terraform sets up the network, security groups, and ECS cluster.
+3.  **Run:** The image is deployed to Fargate behind an Application Load Balancer.
+
